@@ -1,8 +1,8 @@
-from pydantic import BaseModel , EmailStr ,Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional
 
+
 class AddLead(BaseModel):
-    # the frontend sometimes sends an existing leadId; ignore it if provided
     leadId: Optional[str] = None
     name: str
     phone: str = Field(..., pattern=r'^\d{10,15}$')
@@ -12,7 +12,6 @@ class AddLead(BaseModel):
     budget: int = Field(..., ge=0)
     notes: Optional[str] = None
 
-    # validator should reference the actual field name ("phone")
     @field_validator("phone")
     @classmethod
     def validate_phone(cls, value):
@@ -20,7 +19,27 @@ class AddLead(BaseModel):
             raise ValueError("Phone number must contain only digits")
         return value
 
-# if you want a model that includes the generated id, keep this
+
 class LeadWithID(AddLead):
     leadId: str
-    
+
+
+class AddCustomer(BaseModel):
+    customerId: Optional[str] = None
+    Name: str
+    PhoneNumber: str = Field(..., pattern=r'^\d{10,15}$')
+    Email: EmailStr
+    Source: str
+    Budget: int = Field(..., ge=0)
+    Notes: Optional[str] = None
+
+    @field_validator("PhoneNumber")
+    @classmethod
+    def validate_phone(cls, value):
+        if not value.isdigit():
+            raise ValueError("Phone number must contain only digits")
+        return value
+
+
+class CustomerWithID(AddCustomer):
+    customerId: str
